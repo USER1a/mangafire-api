@@ -19,8 +19,9 @@ export async function getChapters(
             }
         );
 
-        const responseJson: { result: { html: string } } = response.data;
-        const $ = load(responseJson.result.html);
+        const responseJson: { result: string | { html: string } } = response.data;
+        const html = typeof responseJson.result === 'string' ? responseJson.result : responseJson.result.html;
+        const $ = load(html);
         const chapters: Chapter[] = [];
 
                 $("li").each((_: number, li: Element) => {
@@ -56,9 +57,15 @@ export async function getChapterImages(chapterId: string): Promise<string[] | Ht
             }
         );
 
-        const responseJson: { result: { images: string[][] } } =
+        const responseJson: { result: string | { images: string[][] } } =
             response.data;
-        return responseJson.result.images.map((image) => image[0]);
+        let images: string[][] = [];
+        if (typeof responseJson.result === 'string') {
+            images = JSON.parse(responseJson.result).images;
+        } else {
+            images = responseJson.result.images;
+        }
+        return images.map((image: string[]) => image[0]);
     } catch (err: any) {
         if (err instanceof AxiosError) {
             throw createHttpError(err?.response?.status || 500, err?.response?.statusText || 'Something went wrong');
