@@ -10,8 +10,9 @@ export async function getChapters(
     language: string = "en"
 ): Promise<Chapter[] | HttpError> {
     try {
+        const idForAjax = mangaId.includes('.') ? mangaId.split(".")[1] : mangaId;
         const response = await client.get(
-            `/ajax/read/${mangaId.split(".")[1]}/chapter/${language.toLowerCase()}`,
+            `/ajax/read/${idForAjax}/chapter/${language.toLowerCase()}`,
             {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
